@@ -1,0 +1,50 @@
+{
+  "6.1": [
+    "Generate a base pod manifest with `kubectl run` and `--dry-run=client -o yaml`, then add two `securityContext` blocks: one on the pod spec and one on the container.",
+    "Pod level takes `runAsUser`, `runAsGroup` and `fsGroup`; the container-level `securityContext` (with `runAsUser` and `allowPrivilegeEscalation`) overrides the pod's user, so `id` should show the container's UID but the pod's GID."
+  ],
+  "6.2": [
+    "Linux capabilities are configured per container in its `securityContext`, not at pod level.",
+    "Use `securityContext.capabilities` with the `add` and `drop` lists, written without the `CAP_` prefix. Read `CapEff` from `/proc/1/status` to check, and remember it only reflects them when the process runs as root."
+  ],
+  "6.3": [
+    "Start from `kubectl create deployment` with `--dry-run=client -o yaml`, then split the hardening settings between pod-level and container-level `securityContext`.",
+    "`runAsNonRoot`, `runAsUser` and `seccompProfile` (type `RuntimeDefault`) fit the pod level; `readOnlyRootFilesystem`, `allowPrivilegeEscalation` and `capabilities.drop` go on the container. A read-only root breaks nginx, so mount an `emptyDir` volume at `/tmp`."
+  ],
+  "6.4": [
+    "Save the given manifest to a file, apply it, and read the pod's logs: the stock nginx image expects to start as root, so a different UID gets permission errors on its cache directories.",
+    "The unprivileged nginx variant is built to run as a non-root user and listens on 8080, so update `containerPort` too (low ports aren't the issue; runtimes let non-root bind them). Pod specs are immutable here, so recreate the pod from the edited file with `kubectl replace --force`."
+  ],
+  "6.5": [
+    "Create the Secret imperatively with `kubectl create secret generic`, then consume it twice in one pod: as env vars and as a mounted volume.",
+    "Env vars use `valueFrom.secretKeyRef` with `name` and `key`; the mount needs a `secret.secretName` volume plus a `volumeMounts` entry with `readOnly: true`. Quoting literal values that contain special characters is a good habit."
+  ],
+  "6.6": [
+    "Use the RBAC generators `kubectl create sa`, `create role` and `create rolebinding` in the namespace, then attach the ServiceAccount to the pod.",
+    "`kubectl run` has no ServiceAccount flag, so add `serviceAccountName` to the generated YAML. The rolebinding subject format is `namespace:name` via `--serviceaccount`, and `kubectl auth can-i` with `--as=system:serviceaccount:<ns>:<name>` proves the permissions."
+  ],
+  "6.7": [
+    "Rights in every namespace come from a ClusterRole combined with a ClusterRoleBinding; a RoleBinding that points at a ClusterRole limits it to its own namespace.",
+    "The task wants all API groups, which `--resource=pods` does not give you (it yields the core group only), so write `apiGroups` as a wildcard in YAML. Check with `kubectl auth can-i` in another namespace such as `kube-system`, and also check a verb you did not grant."
+  ],
+  "6.8": [
+    "Modern clusters no longer auto-create token Secrets, so ask the TokenRequest API for a token instead.",
+    "Use `kubectl create token` with `--duration`, and redirect only its stdout into the file. A legacy long-lived token would need a Secret of type `kubernetes.io/service-account-token` with an annotation naming the ServiceAccount."
+  ],
+  "6.9": [
+    "A default-deny policy is a NetworkPolicy that selects every pod in the namespace and lists both directions without any allow rules.",
+    "Use an empty `podSelector: {}` and set `policyTypes` to both `Ingress` and `Egress`, with no `ingress` or `egress` sections. This also blocks DNS, so a test pod's wget fails with `bad address`."
+  ],
+  "6.10": [
+    "You need two policies: an ingress policy on the `app=web` pods, and an egress policy on the `role=frontend` pods, since default deny blocks the client's outgoing traffic too.",
+    "The client egress must allow TCP 80 to `app=web` pods and also DNS (port 53 over UDP and TCP) to `kube-system`, selected with a `namespaceSelector` on the `kubernetes.io/metadata.name` label. Each `ports` entry needs a `protocol` and `port`."
+  ],
+  "6.11": [
+    "A single ingress rule can list several sources under `from`, and its `ports` list applies to all of them.",
+    "Combine a `namespaceSelector` and an `ipBlock` as separate list items (OR). The `ipBlock` takes `cidr` plus `except`. Putting `namespaceSelector` and `podSelector` in the same item would AND them instead."
+  ],
+  "6.12": [
+    "`kubectl expose` fails because the pod has no labels, so first give the pod a label, then build a NodePort Service selecting on it.",
+    "`kubectl create service nodeport` with `--tcp` and `--node-port` generates YAML whose selector defaults to the service name; edit the `selector` to match your new label before applying."
+  ]
+}

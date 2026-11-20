@@ -1,0 +1,54 @@
+{
+  "7.1": [
+    "Generate the Deployment with `kubectl create deployment` and `--dry-run=client -o yaml`, name its container port, and apply it before generating the Service: `kubectl expose` reads the Deployment from the API server.",
+    "Give the container port a `name: http` in the Deployment, and set the Service's `targetPort` to that name (`--target-port=http` works with expose) instead of a number. Apply the Service file too."
+  ],
+  "7.2": [
+    "A Service routes by its selector, so repointing it is just a patch of `spec.selector` to the new Deployment's pod label.",
+    "Check the labels with `--show-labels` first. The existing Service uses a named `targetPort` that the httpd pods do not define, so change `targetPort` to the number 80 before switching the selector, and restore the name when you switch back."
+  ],
+  "7.3": [
+    "Expose the same Deployment again with `kubectl expose` and a different `--type` and `--name` for each Service.",
+    "`kubectl expose` cannot set the node port, so generate YAML and add `nodePort` under `ports`. For the LoadBalancer you need both `--port` and `--target-port`; without a cloud provider the external IP stays `<pending>`."
+  ],
+  "7.4": [
+    "Services get cluster DNS names of the form service, namespace, `svc`, cluster domain; across namespaces you must at least add the namespace.",
+    "The short cross-namespace form is `<svc>.<ns>`, and the FQDN adds `.svc.cluster.local`. Make sure the output directory exists before writing the file."
+  ],
+  "7.5": [
+    "Add the chart repository with `helm repo add` and `helm repo update`, then install into a new namespace; check the default for the controller kind with `helm show values`.",
+    "Override the chart value `controller.kind` with `--set`, and use `--create-namespace` with `-n`. Don't run this if the minikube ingress addon already created IngressClass `nginx`."
+  ],
+  "7.6": [
+    "Add the podinfo chart repo, then use `helm install`, `upgrade`, `history` and `rollback` against the release in its namespace, with `--set` for the chart values (`replicaCount`, `service.type`).",
+    "On upgrade use `--reuse-values` so the earlier settings are kept, and `helm rollback` takes the release name and revision number. To list every release in every namespace in any state, use `helm list -A` (Helm 4 shows all states by default; Helm 3 needs `-a` too)."
+  ],
+  "7.7": [
+    "Create the pods and expose them as Services, then use the `kubectl create ingress` generator with one `--rule` per host and `--class`.",
+    "The rule format is `host/path=service:port`; a trailing `/*` on the path yields `pathType: Prefix`, while without it you get `Exact`. Use `--dry-run=client -o yaml` and apply."
+  ],
+  "7.8": [
+    "Use `kubectl create ingress` again, adding one `--rule` per path for the host. For requests to other hosts, ingress-nginx needs a separate Ingress that has only a default backend and no rules.",
+    "Use `/api*` and `/*` as the path suffixes to get Prefix matching, and `--default-backend=<svc>:<port>` for the fallback (it becomes `spec.defaultBackend`). On an Ingress with rules, ingress-nginx applies it only to that Ingress's own hosts."
+  ],
+  "7.9": [
+    "Gateway API needs two objects besides the Service: a Gateway that owns the listener, and an HTTPRoute that attaches to it via `parentRefs`.",
+    "The Gateway uses `gatewayClassName: traefik`, a listener on port 8000 (Traefik's HTTP entrypoint) with `protocol: HTTP`, and `allowedRoutes.namespaces.from: Same`. The route's `rules` hold `matches` with a `PathPrefix` and `backendRefs` naming the Service and port."
+  ],
+  "7.10": [
+    "A canary split in Gateway API is done by listing several backends in the same HTTPRoute rule and giving them weights.",
+    "Add the second Service under `backendRefs` and put a `weight` on each entry, here 90 and 10."
+  ],
+  "7.11": [
+    "A plain-Kubernetes canary works through labels: one Service whose selector matches pods from both Deployments, with the replica ratio setting the traffic share.",
+    "Both Deployments share the `app: myapp` label, and each adds its own `version` label in both `selector.matchLabels` and the pod template. The Service selects only on the shared label, so 4 plus 1 replicas gives roughly 20%."
+  ],
+  "7.12": [
+    "Blue/green here means two Deployments with different labels and a Service selector that decides which is live.",
+    "The default generator labels pods `app=<name>`, so rewrite the label to `color` before applying. The switch is a single patch of the Service's `spec.selector`; delete the old Deployment afterwards."
+  ],
+  "7.13": [
+    "`kubectl port-forward` tunnels straight to a pod without any Service, so run it in the background while you test.",
+    "Use the `local:remote` port form, `pod/<name>` as the target, and `&` to background it. Then use curl with `-o /dev/null -w` and the status-code format, redirect the result to the file, and kill the job."
+  ]
+}

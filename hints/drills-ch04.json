@@ -1,0 +1,50 @@
+{
+  "4.1": [
+    "Reach for a Job; `kubectl create job` can generate the skeleton with `--dry-run=client -o yaml`, but it has no flags for how many runs or how many at once, so edit the YAML.",
+    "Set `spec.completions` and `spec.parallelism` on the Job, and put `restartPolicy: Never` in the pod template so pods are never restarted in place."
+  ],
+  "4.2": [
+    "Generate a Job skeleton and add the time and retry limits to the Job spec, then read the outcome from the Job's `status.conditions` after it stops.",
+    "Use `spec.activeDeadlineSeconds` and `spec.backoffLimit`; extract the `reason` with a JSONPath filter on the condition whose `type` is `Failed` (`jsonpath` with `?(@.type==...)`), and create the directory under `/opt/course` first."
+  ],
+  "4.3": [
+    "Use `kubectl create cronjob` with a cron schedule expression, generating YAML with `--dry-run=client -o yaml` so you can add the history settings.",
+    "The history keepers are `successfulJobsHistoryLimit` and `failedJobsHistoryLimit` directly under the CronJob `spec`; \"every 2 minutes\" is `*/2` in the minute field."
+  ],
+  "4.4": [
+    "Two separate behaviours are needed: one governs overlapping runs (a CronJob-level setting), the other limits how long each Job may run (a Job-level setting).",
+    "Use `concurrencyPolicy: Forbid` in the CronJob spec, and put `activeDeadlineSeconds` under `jobTemplate.spec`, not in the CronJob spec itself."
+  ],
+  "4.5": [
+    "A pod whose labels no longer match its ReplicaSet's selector is no longer managed by it; relabel one pod with `kubectl label ... --overwrite` and watch what the ReplicaSet does.",
+    "The Deployment's pods carry `app=design2`; after changing one to `app=orange`, delete just that pod with `-l app=orange` so you don't touch the healthy ones."
+  ],
+  "4.6": [
+    "Create the four pods with `kubectl run` and the `-l` flag for labels, then act on groups of pods with label selectors instead of names.",
+    "`-l system=tux` matches the exact label for deletion, `-l env` (key only) matches any value of that key, and set-based selectors use the form `'key in (a,b)'` with quotes."
+  ],
+  "4.7": [
+    "Generate a Deployment with the Python command after `--`, then add resources afterwards with `kubectl set resources`; the process allocates more memory than the limit allows, so expect the container to be killed.",
+    "Look for `OOMKilled` / exit code 137 under `Last State` in `kubectl describe`; the fix is raising only `--limits` memory above what the process allocates (about 250 MiB)."
+  ],
+  "4.8": [
+    "Pod resources can't normally be edited on a live pod, so export the pod YAML, edit the `resources` block, and replace the pod.",
+    "Limits go in a `limits` map next to `requests`: CPU limit is double the 200m request, plus memory entries in both; apply with `kubectl replace --force -f`."
+  ],
+  "4.9": [
+    "A ResourceQuota can be created imperatively with `kubectl create quota` and a comma-separated `--hard` list of resource names.",
+    "Once the quota covers cpu and memory, every pod must declare requests and limits or admission rejects it; use the keys `requests.cpu`, `requests.memory`, `limits.cpu`, `limits.memory` and `pods`."
+  ],
+  "4.10": [
+    "There is no imperative generator for this; write a LimitRange manifest of `type: Container` (use `kubectl explain limitrange.spec.limits` if unsure).",
+    "`defaultRequest` sets the default requests, `default` sets the default limits, and `max` caps what a container may ask for; the quota from 4.9 is then satisfied by the injected defaults."
+  ],
+  "4.11": [
+    "Use an init container in the pod spec that loops until DNS resolves; the main container only starts after the init container exits successfully.",
+    "Put it under `spec.initContainers` with a `sh -c` `until ...; do sleep` loop around a DNS lookup of the full service name; the pod shows `Init:0/1` until `kubectl create service clusterip` creates the Service with that name in the same namespace."
+  ],
+  "4.12": [
+    "List CRDs with `kubectl get crd`, then read fields from the CRD object itself with JSONPath instead of describing it by eye.",
+    "Group is `.spec.group`, scope is `.spec.scope`, and served versions need a filter on `.spec.versions[?(@.served==true)]`; for the objects use `.spec.names.plural` with `-A`."
+  ]
+}

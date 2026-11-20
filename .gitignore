@@ -1,0 +1,6 @@
+# Local material that is not part of this project
+private/
+
+# Local tooling
+.DS_Store
+.claude/

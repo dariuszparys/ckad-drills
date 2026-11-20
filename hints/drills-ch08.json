@@ -1,0 +1,46 @@
+{
+  "8.1": [
+    "Start with `kubectl describe` on the pod and read its Events section; the scheduler explains there why it could not place the pod. The same event reason can also be pulled from the events list with a field selector on the involved object.",
+    "You cannot edit a running pod's CPU request in place, so export the pod to YAML, change the request, and recreate it with `replace --force`. Write only the event reason (not the whole message) to the file."
+  ],
+  "8.2": [
+    "Look at the pod status and the `describe` events for the pull failure; the image reference itself is the suspect. Then fix the Deployment with the imperative image-update subcommand of `kubectl set`.",
+    "Check the image tag for a typo. `kubectl set image` needs the container name (the Deployment was created from the image, so check what it is called) in the form `container=image:tag`; follow with `rollout status`."
+  ],
+  "8.3": [
+    "A crashing container is restarted, so the current instance may have no output yet. Ask `kubectl logs` for the earlier instance, and read the exit code from the pod's status rather than from logs.",
+    "Use the `--previous` flag on logs while the pod shows `CrashLoopBackOff`; while it shows `Error` the finished instance is still the current one, so plain `logs` returns it. The exit code lives at `status.containerStatuses[0].lastState.terminated.exitCode`, which you can extract with `-o jsonpath`."
+  ],
+  "8.4": [
+    "Compare the Service's endpoints with the pod labels and with the port the container really listens on. An empty endpoints list points at the selector, and a working endpoint on the wrong port points at `targetPort`.",
+    "There are two bugs: `spec.selector` must match the pod labels exactly, and `targetPort` must be nginx's real port. A JSON patch (`--type=json`) can replace both fields in one command, and you must not touch the Deployment."
+  ],
+  "8.5": [
+    "The `apiVersion` is for a group version that no longer exists. Generate a fresh Deployment with a dry-run and compare its structure with the broken file, and use `kubectl explain` for fields you are unsure about.",
+    "Besides switching to `apps/v1`, that API version makes `spec.selector` mandatory, and its `matchLabels` must match the pod template labels."
+  ],
+  "8.6": [
+    "The image has no shell, so use `kubectl debug` to attach an ephemeral container with a debug image instead of `exec`. To see the target's processes it has to share the process namespace of that container.",
+    "Use `--target=<container name>` so the ephemeral container joins the target's process namespace. For a non-interactive run, pass the command (`ps aux`) after `--` and then read the ephemeral container's output with `kubectl logs -c`; its name is under `spec.ephemeralContainers`."
+  ],
+  "8.7": [
+    "Describe the pod and look at the Readiness line and events: the pod is Running but not Ready, so the Service has no endpoints. Work out what the probe command checks for.",
+    "The probe runs `cat` on a file that does not exist. Create that file inside the running container with `exec` (the pod must not be recreated), and wait one probe period for the pod to become Ready. If the image had no shell, an ephemeral container could reach the target filesystem via `/proc/1/root`."
+  ],
+  "8.8": [
+    "Use the built-in metrics tooling, `kubectl top pod`, across all namespaces and sorted by memory. This needs metrics-server running.",
+    "Use `--sort-by=memory` together with `-A`, and `--no-headers` so the first line is the top pod. Then reshape the two columns (namespace and name) into `<namespace>/<pod>`."
+  ],
+  "8.9": [
+    "`kubectl events` lists events in time order and can filter by type, so it gives newest-last output directly. With `kubectl get events` you filter by type on the server side and must pick a timestamp field that is always set.",
+    "Use `--types=Warning` with `kubectl events`. If you use `get events` instead, sort by `.metadata.creationTimestamp`: `.lastTimestamp` can be empty for events written through the newer events API, which puts them out of order."
+  ],
+  "8.10": [
+    "Run a throwaway busybox pod with the `--rm` and `--restart=Never` options and use `nslookup` for the two names and `nc` for the TCP check. For the TCP test you need the Service's ClusterIP, which the DNS lookup gives you.",
+    "Use `nc -z` with a timeout (`-w`) against the ClusterIP and port 8080. If the IP works but names fail, look at the pod's `/etc/resolv.conf`, the CoreDNS pods and their logs (label `k8s-app=kube-dns`), and a NetworkPolicy that may block egress to port 53."
+  ],
+  "8.11": [
+    "Describe the pod and filter its events for Unhealthy and Killing messages to see what the liveness probe is getting back. Then ask whether the probe's target matches what nginx actually serves.",
+    "nginx has no `/healthz`, so the path in `livenessProbe.httpGet` returns a 404. `failureThreshold: 1` also makes the container restart on the first failure, so restore a sensible value. You must keep the HTTP check on port 80."
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "mock-1": [
+    "Generate a single-container pod with a dry-run and extend the YAML by hand: add a second container and one shared volume. Each container mounts the same volume at its own path.",
+    "The size limit goes under the volume's `emptyDir` as `sizeLimit`, and read-only is a `readOnly` field on the shipper's `volumeMounts` entry, not on the volume. Give the command as a YAML list of separate words."
+  ],
+  "mock-2": [
+    "Generate the Job with `kubectl create job` and a dry-run, then add the batch settings to the spec by hand. Capture the output with `kubectl logs` on the job before it is cleaned up.",
+    "The relevant fields are `completions`, `parallelism`, `backoffLimit` and `ttlSecondsAfterFinished`. Pods in a Job need `restartPolicy` Never or OnFailure, and after the TTL the Job and its pods vanish, so save the logs first."
+  ],
+  "mock-3": [
+    "Generate the CronJob with `kubectl create cronjob` and a dry-run, then add the policy fields. Trigger the manual run with `kubectl create job` using the `--from` option.",
+    "`activeDeadlineSeconds` belongs under `jobTemplate.spec` (the Job), while `concurrencyPolicy` and `successfulJobsHistoryLimit` sit directly in the CronJob spec. For the schedule, remember the cron field order: minute comes first."
+  ],
+  "mock-4": [
+    "Write the page content to a file first, then write a small Dockerfile that starts from the given base and puts that file at the target path. Build it with a tag, then export the tagged image with the tool's `save` command.",
+    "Use `COPY` in the Dockerfile and use the `-t` flag with `mock-web:v2` when building. Save with `-o` pointing at the `.tar` file, and check the archive with `tar tf`."
+  ],
+  "mock-5": [
+    "Generate the Deployment with a dry-run and add the `strategy` block by hand. Then use `kubectl set image`, `kubectl annotate` for the change cause, and the `rollout history` and `rollout undo` commands.",
+    "The strategy fields are `rollingUpdate.maxUnavailable: 0` and `maxSurge: 1`. The change cause is the `kubernetes.io/change-cause` annotation, and `rollout undo --to-revision` needs the revision number of the 1.27 version from the history; that same number is what goes into the file, not the new number it gets after the undo."
+  ],
+  "mock-6": [
+    "A canary needs no Service change: the Service selects on `app=checkout` only, so a second Deployment with that label receives traffic in proportion to its pod count. Three v1 pods plus one v2 pod gives 25 percent.",
+    "Each Deployment needs a distinguishing `version` label in both its selector `matchLabels` and its template labels, plus the shared `app=checkout`, so their selectors don't overlap. Check with `-L version` on pods and with the Service's EndpointSlices."
+  ],
+  "mock-7": [
+    "Add the repo, then install the pinned chart version with `--set` for the two values. The upgrade must keep those values, so think about which upgrade flag carries over previous values. For finding broken releases, look at the filter flags of `helm list` across all namespaces.",
+    "Use `--reuse-values` on `helm upgrade` (with the same `--version`) so the earlier `--set` values stay, and check them with `helm get values`. For the last part, `helm list -A` with `--failed` and `--pending`, and write `none` when the output is empty."
+  ],
+  "mock-8": [
+    "Generate the Deployment with a dry-run and add three probes to the container: `startupProbe` and `readinessProbe` with `httpGet`, and `livenessProbe` with `tcpSocket`.",
+    "The startup budget of 60 s with a 5 s period translates into `periodSeconds: 5` and `failureThreshold: 12`. The liveness probe is where `initialDelaySeconds: 10` and `periodSeconds: 15` go."
+  ],
+  "mock-9": [
+    "Edit the file itself rather than generating a new one. Update the `apiVersion` to the current group for Deployments and check what that version requires in the spec; `kubectl explain` can confirm it.",
+    "`apps/v1` requires `spec.selector`, and its `matchLabels` must match the template labels. After applying, confirm both replicas are ready."
+  ],
+  "mock-10": [
+    "For the logs, filter first and then trim: the order of `grep` and `tail` matters. For the Service, compare its endpoints with the port the container actually listens on.",
+    "Filter with `grep ERROR` before `tail -10`. The bug is the Service's `targetPort` (the `--tcp=80:8080` form made it 8080); fix it with a JSON patch and the selector is already correct. The endpoints column from `get ep` gives the IP:port list."
+  ],
+  "mock-11": [
+    "Create the ConfigMap with `--from-literal` for the two variables and `--from-file` for the properties file, and the Secret with `kubectl create secret generic`. In the pod, use `envFrom` for the ConfigMap and a single `secretKeyRef` env var for the password.",
+    "Since Kubernetes v1.34 env var names may contain dots, so `envFrom` imports `app.properties` too, which is fine here. To mount only that key as a file, use `items` (key and path) on the ConfigMap volume, and quote the Secret value so the shell does not treat `!` specially."
+  ],
+  "mock-12": [
+    "Security settings live in two places: user, group and `fsGroup` at the pod-level `securityContext`, and the hardening options at the container-level `securityContext`. Add an `emptyDir` volume for the writable path.",
+    "Container-level fields are `runAsNonRoot`, `readOnlyRootFilesystem`, `allowPrivilegeEscalation: false`, and `capabilities` with `drop: [\"ALL\"]` and `add`. `fsGroup` is only valid at the pod level."
+  ],
+  "mock-13": [
+    "Create the ServiceAccount, then a Role plus RoleBinding (not cluster-wide). Use the imperative `kubectl create role` and `create rolebinding` commands, and for the Deployment attach the account with `kubectl set serviceaccount` or a `serviceAccountName` field.",
+    "Deployments are in the `apps` group, so the role resource is `deployments.apps`, while pods are in the core group; you can use two Roles or one Role with two rules. The `--serviceaccount` flag takes `namespace:name`, and the `can-i` output is `no`, which still must be redirected into the file."
+  ],
+  "mock-14": [
+    "The ResourceQuota has an imperative generator with `--hard`. The LimitRange has none, so write it as YAML, and set the Deployment's resources with `kubectl set resources`.",
+    "In a LimitRange, `defaultRequest` holds the default requests and `default` holds the default limits; use `type: Container`. The worker's explicit values must fit the quota: 3 replicas times 200m is 600m of CPU requests."
+  ],
+  "mock-15": [
+    "Create the three Deployments imperatively (they get an `app=<name>` label automatically), then write both NetworkPolicies as YAML. One selects the db pods for Ingress, the other selects the backend pods for Egress.",
+    "In `backend-egress` set `policyTypes: [Egress]` and use two separate egress rules: one `podSelector` for db on TCP 6379, and one `namespaceSelector: {}` for DNS with both UDP and TCP on port 53. Without the DNS rule backend cannot resolve names."
+  ],
+  "mock-16": [
+    "Use `kubectl expose` for the ClusterIP Services (with `--name`, `--port`, `--target-port`) and `kubectl create ingress` with `--rule` for the Ingress. The NodePort Service is trickier, because the imperative generator names the selector after the service.",
+    "`create service nodeport` sets the selector to `app=shop-np`, so you have to correct it to the `shop` Deployment's label, e.g. by editing the generated YAML before applying; also `--node-port=30808`. The Ingress rules need `pathType: Prefix` and `ingressClassName: nginx`, and the test script should send a `Host` header since the rule is host-based."
+  ]
+}

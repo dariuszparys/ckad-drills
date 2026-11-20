@@ -1,0 +1,469 @@
+{
+ "source": "CKAD curriculum v1.37 (github.com/cncf/curriculum), domains and competencies as on the Linux Foundation CKAD page, read 2026-11-20",
+ "domains": [
+  {
+   "slug": "design-build",
+   "title": "Application Design and Build",
+   "weight": 20,
+   "file": "01-design-build.md",
+   "competencies": [
+    {
+     "slug": "images",
+     "title": "Define, build and modify container images"
+    },
+    {
+     "slug": "workloads",
+     "title": "Choose and use the right workload resource (Deployment, DaemonSet, CronJob, etc.)"
+    },
+    {
+     "slug": "multi-container",
+     "title": "Understand multi-container Pod design patterns (e.g. sidecar, init and others)"
+    },
+    {
+     "slug": "volumes",
+     "title": "Utilize persistent and ephemeral volumes"
+    }
+   ]
+  },
+  {
+   "slug": "deployment",
+   "title": "Application Deployment",
+   "weight": 20,
+   "file": "02-deployment.md",
+   "competencies": [
+    {
+     "slug": "strategies",
+     "title": "Use Kubernetes primitives to implement common deployment strategies (e.g. blue/green or canary)"
+    },
+    {
+     "slug": "rolling-updates",
+     "title": "Understand Deployments and how to perform rolling updates"
+    },
+    {
+     "slug": "helm",
+     "title": "Use the Helm package manager to deploy existing packages"
+    },
+    {
+     "slug": "kustomize",
+     "title": "Kustomize"
+    }
+   ]
+  },
+  {
+   "slug": "observability",
+   "title": "Application Observability and Maintenance",
+   "weight": 15,
+   "file": "03-observability.md",
+   "competencies": [
+    {
+     "slug": "api-deprecations",
+     "title": "Understand API deprecations"
+    },
+    {
+     "slug": "probes",
+     "title": "Implement probes and health checks"
+    },
+    {
+     "slug": "monitoring",
+     "title": "Use built-in CLI tools to monitor Kubernetes applications"
+    },
+    {
+     "slug": "logs",
+     "title": "Utilize container logs"
+    },
+    {
+     "slug": "debugging",
+     "title": "Debugging in Kubernetes"
+    }
+   ]
+  },
+  {
+   "slug": "config-security",
+   "title": "Application Environment, Configuration and Security",
+   "weight": 25,
+   "file": "04-config-security.md",
+   "competencies": [
+    {
+     "slug": "crds",
+     "title": "Discover and use resources that extend Kubernetes (CRD, Operators)"
+    },
+    {
+     "slug": "authn-authz",
+     "title": "Understand authentication, authorization and admission control"
+    },
+    {
+     "slug": "quotas",
+     "title": "Understand requests, limits, quotas"
+    },
+    {
+     "slug": "configmaps",
+     "title": "Understand ConfigMaps"
+    },
+    {
+     "slug": "resources",
+     "title": "Define resource requirements"
+    },
+    {
+     "slug": "secrets",
+     "title": "Create & consume Secrets"
+    },
+    {
+     "slug": "serviceaccounts",
+     "title": "Understand ServiceAccounts"
+    },
+    {
+     "slug": "security-context",
+     "title": "Understand Application Security (SecurityContexts, Capabilities, etc.)"
+    }
+   ]
+  },
+  {
+   "slug": "networking",
+   "title": "Services and Networking",
+   "weight": 20,
+   "file": "05-services-networking.md",
+   "competencies": [
+    {
+     "slug": "networkpolicies",
+     "title": "Demonstrate basic understanding of NetworkPolicies"
+    },
+    {
+     "slug": "services",
+     "title": "Provide and troubleshoot access to applications via services"
+    },
+    {
+     "slug": "ingress",
+     "title": "Use Ingress rules to expose applications"
+    }
+   ]
+  },
+  {
+   "slug": "extras",
+   "title": "Foundations and extras",
+   "weight": null,
+   "file": "06-extras.md",
+   "note": "Not bullets in the official curriculum, but every task relies on the first one, and the drills cover the second.",
+   "competencies": [
+    {
+     "slug": "kubectl-basics",
+     "title": "kubectl fluency: Pods, namespaces, labels and selectors, kubectl explain"
+    },
+    {
+     "slug": "gateway-api",
+     "title": "Gateway API"
+    }
+   ]
+  }
+ ],
+ "drills": {
+  "2.1": [
+   "kubectl-basics"
+  ],
+  "2.2": [
+   "services"
+  ],
+  "2.3": [
+   "services"
+  ],
+  "2.4": [
+   "multi-container"
+  ],
+  "2.5": [
+   "multi-container"
+  ],
+  "2.6": [
+   "workloads"
+  ],
+  "2.7": [
+   "workloads"
+  ],
+  "2.8": [
+   "kubectl-basics"
+  ],
+  "2.9": [
+   "kubectl-basics"
+  ],
+  "2.10": [
+   "debugging"
+  ],
+  "2.11": [
+   "kubectl-basics"
+  ],
+  "3.1": [
+   "images"
+  ],
+  "3.2": [
+   "images"
+  ],
+  "3.3": [
+   "images"
+  ],
+  "3.4": [
+   "probes"
+  ],
+  "3.5": [
+   "probes"
+  ],
+  "3.6": [
+   "probes",
+   "multi-container"
+  ],
+  "3.7": [
+   "probes"
+  ],
+  "3.8": [
+   "logs"
+  ],
+  "3.9": [
+   "probes",
+   "debugging"
+  ],
+  "3.10": [
+   "workloads"
+  ],
+  "4.1": [
+   "workloads"
+  ],
+  "4.2": [
+   "workloads"
+  ],
+  "4.3": [
+   "workloads"
+  ],
+  "4.4": [
+   "workloads"
+  ],
+  "4.5": [
+   "kubectl-basics"
+  ],
+  "4.6": [
+   "kubectl-basics"
+  ],
+  "4.7": [
+   "resources"
+  ],
+  "4.8": [
+   "resources"
+  ],
+  "4.9": [
+   "quotas"
+  ],
+  "4.10": [
+   "quotas"
+  ],
+  "4.11": [
+   "multi-container"
+  ],
+  "4.12": [
+   "crds"
+  ],
+  "5.1": [
+   "configmaps"
+  ],
+  "5.2": [
+   "configmaps"
+  ],
+  "5.3": [
+   "configmaps"
+  ],
+  "5.4": [
+   "secrets"
+  ],
+  "5.5": [
+   "rolling-updates"
+  ],
+  "5.6": [
+   "rolling-updates"
+  ],
+  "5.7": [
+   "rolling-updates"
+  ],
+  "5.8": [
+   "rolling-updates"
+  ],
+  "5.9": [
+   "volumes"
+  ],
+  "5.10": [
+   "volumes",
+   "multi-container"
+  ],
+  "5.11": [
+   "volumes"
+  ],
+  "5.12": [
+   "kustomize"
+  ],
+  "6.1": [
+   "security-context"
+  ],
+  "6.2": [
+   "security-context"
+  ],
+  "6.3": [
+   "security-context"
+  ],
+  "6.4": [
+   "security-context",
+   "debugging"
+  ],
+  "6.5": [
+   "secrets"
+  ],
+  "6.6": [
+   "serviceaccounts",
+   "authn-authz"
+  ],
+  "6.7": [
+   "authn-authz"
+  ],
+  "6.8": [
+   "serviceaccounts"
+  ],
+  "6.9": [
+   "networkpolicies"
+  ],
+  "6.10": [
+   "networkpolicies"
+  ],
+  "6.11": [
+   "networkpolicies"
+  ],
+  "6.12": [
+   "services"
+  ],
+  "7.1": [
+   "services"
+  ],
+  "7.2": [
+   "services"
+  ],
+  "7.3": [
+   "services"
+  ],
+  "7.4": [
+   "services"
+  ],
+  "7.5": [
+   "helm",
+   "ingress"
+  ],
+  "7.6": [
+   "helm"
+  ],
+  "7.7": [
+   "ingress"
+  ],
+  "7.8": [
+   "ingress"
+  ],
+  "7.9": [
+   "gateway-api"
+  ],
+  "7.10": [
+   "gateway-api",
+   "strategies"
+  ],
+  "7.11": [
+   "strategies"
+  ],
+  "7.12": [
+   "strategies"
+  ],
+  "7.13": [
+   "services",
+   "debugging"
+  ],
+  "8.1": [
+   "debugging"
+  ],
+  "8.2": [
+   "debugging"
+  ],
+  "8.3": [
+   "logs",
+   "debugging"
+  ],
+  "8.4": [
+   "services",
+   "debugging"
+  ],
+  "8.5": [
+   "api-deprecations"
+  ],
+  "8.6": [
+   "debugging"
+  ],
+  "8.7": [
+   "probes",
+   "debugging"
+  ],
+  "8.8": [
+   "monitoring"
+  ],
+  "8.9": [
+   "monitoring"
+  ],
+  "8.10": [
+   "services",
+   "debugging"
+  ],
+  "8.11": [
+   "probes"
+  ],
+  "mock-1": [
+   "multi-container",
+   "volumes"
+  ],
+  "mock-2": [
+   "workloads"
+  ],
+  "mock-3": [
+   "workloads"
+  ],
+  "mock-4": [
+   "images"
+  ],
+  "mock-5": [
+   "rolling-updates"
+  ],
+  "mock-6": [
+   "strategies"
+  ],
+  "mock-7": [
+   "helm"
+  ],
+  "mock-8": [
+   "probes"
+  ],
+  "mock-9": [
+   "api-deprecations"
+  ],
+  "mock-10": [
+   "logs",
+   "services"
+  ],
+  "mock-11": [
+   "configmaps",
+   "secrets"
+  ],
+  "mock-12": [
+   "security-context"
+  ],
+  "mock-13": [
+   "serviceaccounts",
+   "authn-authz"
+  ],
+  "mock-14": [
+   "quotas",
+   "resources"
+  ],
+  "mock-15": [
+   "networkpolicies"
+  ],
+  "mock-16": [
+   "services",
+   "ingress"
+  ]
+ }
+}

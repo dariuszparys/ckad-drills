@@ -1,0 +1,42 @@
+{
+  "3.1": [
+    "Write the Dockerfile with `FROM`, a step creating `/data`, a `COPY` of the script, and a `CMD`, then build with a tag from the directory containing both files.",
+    "Use the exec (JSON array) form for `CMD`, copy the script to the destination path `/app/ticker.py`, and build with `-t ticker:v1` and the build context `.`; podman and docker use the same syntax."
+  ],
+  "3.2": [
+    "Tagging just adds another name to the existing image, and the export to a tar archive is a separate `save` operation, so no rebuild is needed.",
+    "`tag` takes source and new name, and `save` needs `-o <path>` (or output redirection with docker) followed by the original image name; create the target directory first."
+  ],
+  "3.3": [
+    "The flow is tag the image with the registry host as prefix, push, query the registry's HTTP API, then create the Deployment from the registry-qualified image.",
+    "Push may need `--tls-verify=false` for a plain-HTTP registry, the catalog lives at `/v2/_catalog`, and the Deployment must use the full `$repo/ticker:v1` image name in namespace `build-a`."
+  ],
+  "3.4": [
+    "Generate a Deployment YAML with a dry run (including the command) and add a `readinessProbe` of the exec type to the container.",
+    "Put the command after `--` in the generator, set `periodSeconds: 5` and `exec.command` as a list with `cat` and `/tmp/healthy`; the file must be created in each pod, so loop over all pods with `exec`, not just one."
+  ],
+  "3.5": [
+    "Add both probes to a generated pod YAML, using the HTTP GET handler type for each.",
+    "Each probe has `httpGet` with `path` and `port`, plus `initialDelaySeconds` and `periodSeconds`; `failureThreshold` is set only on the liveness probe."
+  ],
+  "3.6": [
+    "Generate a Deployment for the first container, then add the second container to the pod template by hand.",
+    "The generated container is named `nginx`, so rename it to `app`; the proxy container uses `args` (not `command`) for `netexec --http-port=8080`, and both probes use `tcpSocket` on port 8080 with different delays and periods."
+  ],
+  "3.7": [
+    "A startup probe holds off the other probes until it succeeds, giving a slow app a long grace period without a long liveness delay.",
+    "The startup budget is `periodSeconds` times `failureThreshold` (5 x 12 = 60 s), which covers the 20 s sleep; both probe blocks (startup and liveness) use the `exec` handler with `cat /tmp/started`."
+  ],
+  "3.8": [
+    "Generate one real request against the pod IP from a temporary pod, then read the logs with a time filter and pipe through a text filter.",
+    "Use `kubectl logs --since=5m` and `grep 'GET /'`; the pod IP is in `.status.podIP`, and kubelet probe requests will also appear in the log lines."
+  ],
+  "3.9": [
+    "Apply it and watch the pod: describe it and read the `Unhealthy` events, which name the exact path and port each probe hits.",
+    "nginx answers 404 for a path it does not serve, and a tcpSocket probe fails on a port nothing listens on; point `web`'s readiness at `/` on its own port 80 and `proxy`'s liveness at 8080. Fix it in place with `kubectl edit`."
+  ],
+  "3.10": [
+    "Scaling a Deployment is done with a dedicated kubectl subcommand, and zero replicas is a valid value.",
+    "Use `kubectl scale deploy` with `--replicas=0`, check the label-selected pods are gone, then repeat with `--replicas=4`."
+  ]
+}

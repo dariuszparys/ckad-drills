@@ -1,0 +1,50 @@
+{
+  "5.1": [
+    "`kubectl create configmap` accepts several sources in one command, so combine a literal flag with file-based flags.",
+    "`--from-literal=key=value` for the literal, `--from-file=./favorite` for the single file (key becomes the filename), and `--from-file=./tones/` with a directory makes one key per file."
+  ],
+  "5.2": [
+    "Generate a Deployment skeleton and add the config injection in the container spec: one entry that picks a single key, and one that imports the whole ConfigMap.",
+    "Single key: `env[].valueFrom.configMapKeyRef` with `name` and `key`; all keys: `envFrom[].configMapRef.name`. Note `kubectl set env --from` uppercases keys, unlike `envFrom`."
+  ],
+  "5.3": [
+    "Create the ConfigMap with `--dry-run=client -o yaml` for YAML output, then give the pod a volume sourced from that ConfigMap and mount it in the container.",
+    "Define it under `spec.volumes` with `configMap.name`, and mount it with `volumeMounts` using `mountPath: /etc/bike` and `readOnly: true`; each key appears as a file."
+  ],
+  "5.4": [
+    "Create the Secret with `kubectl create secret generic` and a literal, then mount it as a volume in a Deployment (generate the skeleton and add the volume yourself).",
+    "A Secret volume uses `secret.secretName` (not `name` as for ConfigMaps); the key `entree` becomes the file `/food/entree` and `base64 -d` decodes the stored value."
+  ],
+  "5.5": [
+    "Change the image with `kubectl set image`, record a reason on the Deployment, then use the `kubectl rollout` subcommands for history and undo.",
+    "`--record` is deprecated, so set the `kubernetes.io/change-cause` annotation with `kubectl annotate ... --overwrite`; `rollout undo` returns to the previous revision (or use `--to-revision`)."
+  ],
+  "5.6": [
+    "The update behaviour lives under the Deployment's `spec.strategy`; generate the Deployment with `--dry-run=client -o yaml` and add the settings.",
+    "Use `rollingUpdate.maxUnavailable: 0` and `maxSurge: 2`, plus `spec.minReadySeconds: 5` for the readiness delay; then trigger the update with `kubectl set image`."
+  ],
+  "5.7": [
+    "Pause the rollout first so that several edits don't each trigger their own rollout, then resume once to roll everything out together.",
+    "Sequence is `kubectl rollout pause`, then `set image` and `set env`, then `kubectl rollout resume`; check that `rollout history` shows only one new revision."
+  ],
+  "5.8": [
+    "Switch the strategy type of the existing Deployment to the one that kills all old pods first.",
+    "The type is `Recreate`, and the `rollingUpdate` block must be removed in the same change or the API rejects it; a JSON patch with `remove` and `replace` operations does both."
+  ],
+  "5.9": [
+    "There is no generator for PV or PVC, so copy the manifests from the Kubernetes docs; the claim binds to the PV by matching storage class, access mode and size.",
+    "Both objects need `storageClassName: manual`; the PV uses `hostPath.path`, `capacity.storage` and `persistentVolumeReclaimPolicy: Retain`, and the PVC (namespaced, unlike the PV) requests 50Mi but will show the PV's full 100Mi once Bound."
+  ],
+  "5.10": [
+    "Define the PVC once as a pod volume and mount that same volume into both containers at the same path.",
+    "Use `persistentVolumeClaim.claimName` under `spec.volumes`, and a `volumeMounts` entry with `mountPath: /var/log/nginx` in each container; the mount hides nginx's stdout symlink so a real `access.log` gets written."
+  ],
+  "5.11": [
+    "Create a PVC first (the default StorageClass provisions it, so omit `storageClassName` and no PV is needed), then edit the Deployment to add a volume and a mount.",
+    "Plain kubectl has no `set volume`, so use `kubectl edit`; add a `volumeMounts` entry at `/newvol` and a `persistentVolumeClaim.claimName: reviewpvc` volume alongside the existing secret volume instead of replacing it."
+  ],
+  "5.12": [
+    "Kustomize is built into kubectl; write a `kustomization.yaml` in the overlay that references the base via `resources` and uses its built-in transformer fields.",
+    "Fields: `namespace`, `namePrefix`, `images` (with `newTag`, quote \"1.28\" so it stays a string), `replicas` (name and count) and `configMapGenerator` with `literals`; preview with `kubectl kustomize` and apply with `-k`."
+  ]
+}

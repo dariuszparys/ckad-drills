@@ -1,0 +1,46 @@
+{
+  "2.1": [
+    "`kubectl run` can generate the pod for you, including the port and the labels, so start from a dry-run YAML and create the namespace first.",
+    "The generated container is named after the pod (`webpod`), so rename it to `webcont` in the YAML; `--port` becomes `containerPort` and `--labels` takes a comma-separated list."
+  ],
+  "2.2": [
+    "Create the Service with a generator or plain YAML rather than exposing the pod, because you want control over exactly which labels the Service selects.",
+    "`kubectl expose` copies all pod labels into the selector, while `create service clusterip` defaults the selector to `app: <name>`; edit it to `type: webserver`, and map `port` 8080 to `targetPort` 80."
+  ],
+  "2.3": [
+    "You do not need to recreate the Service; modify the existing one with `patch` or `edit`.",
+    "Set `spec.type` to NodePort and add `nodePort: 30080` inside the existing `spec.ports[]` entry; if you patch the ports list, repeat the whole entry (`port`, `targetPort`, `protocol`)."
+  ],
+  "2.4": [
+    "Generate a single-container pod YAML with a dry run, then add a second entry to the containers list by hand.",
+    "Rename the generated container to `web`, and give `logger` a `command` array of `sh`, `-c`, and the loop string so the busybox container keeps running (otherwise it exits and READY is not 2/2)."
+  ],
+  "2.5": [
+    "A native sidecar is an init container that keeps running alongside the main containers, and both containers share an `emptyDir` volume.",
+    "Put `restartPolicy: Always` on the entry under `initContainers` to make it a sidecar, and mount the `logs` volume at `/var/log/app` in both containers; mind the escaped quotes in the app command."
+  ],
+  "2.6": [
+    "A Deployment can be created fully from the command line, and its ReplicaSet carries the Deployment's `app` label.",
+    "`kubectl create deployment` accepts `--replicas` and `--port`; `-o name` would add a `replicaset.apps/` prefix, so select the ReplicaSet by label and print only `.metadata.name` with jsonpath."
+  ],
+  "2.7": [
+    "The Deployment controller reconciles the desired state, so deleting its ReplicaSet or a pod is only temporary; select the ReplicaSet by label rather than by its generated name.",
+    "Use `delete rs -l app=firstdeploy`, and for the pod use `$(...)` with `get po -o name` to pick one; then check READY on the Deployment returns to 3/3."
+  ],
+  "2.8": [
+    "Pods are mostly immutable, but a few fields can change in place, and there is a dedicated kubectl subcommand for changing images.",
+    "`kubectl set image` takes `pod/<name>` and then `<container-name>=<new-image>`, so use the container name `webcont`; the kubelet restarts that container, which is why RESTARTS becomes 1."
+  ],
+  "2.9": [
+    "Use `kubectl api-resources` for short names, API groups and the namespaced flag, and `kubectl explain` with the dotted field path for types.",
+    "In the `api-resources` output the short name is the SHORTNAMES column, the group/version is the APIVERSION column, and NAMESPACED is true/false; `explain` shows the field type for `runAsUser`, which is an integer."
+  ],
+  "2.10": [
+    "Describe the pod and read the Events at the bottom to find the first failure, then check what happens after you fix it, since there is more than one problem.",
+    "One problem is the image tag typo; the other is the `command` running nginx with `daemon on;`, which backgrounds the process so PID 1 exits. Remove the `command` (or use `daemon off;`), and delete the old pod before re-applying since pod specs are largely immutable."
+  ],
+  "2.11": [
+    "Query pods across all namespaces and format the output so only the names remain, then filter by prefix.",
+    "Use `-A` with `--no-headers` and `-o custom-columns=NAME:.metadata.name`, then `grep '^coredns'` anchored at the start of the name."
+  ]
+}
