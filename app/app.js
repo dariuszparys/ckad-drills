@@ -332,7 +332,7 @@
       <p class="muted">Only want to read? Switch to <strong>Read</strong> mode at the top of the sidebar: it shows every hint, solution and explanation and leaves your progress alone.</p>
       <section class="before md">
         <h3>Before you start</h3>
-        <p>Start the cluster, then open the practice shell in a terminal from this folder. It sets up <code>k</code>, <code>$do</code> and GNU <code>sed</code> like the exam's bash.</p>
+        <p>Start the cluster, then open the practice shell in a terminal, from your copy of <a href="https://github.com/dariuszparys/ckad-drills" target="_blank" rel="noopener">the repository</a>. It sets up <code>k</code>, <code>$do</code> and GNU <code>sed</code> like the exam's bash.</p>
         ${codeBlock("minikube start -p ckad", "bash")}
         ${codeBlock('"$(brew --prefix)/bin/bash" --rcfile ckad-env.sh', "bash")}
         <p class="muted small">First time? Follow <a href="#/doc/README.md">Getting started</a> for the one-time setup (tools, cluster, <code>/opt/course</code>).</p>
