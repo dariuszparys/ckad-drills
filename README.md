@@ -6,6 +6,10 @@ all tested on Kubernetes v1.37. The page shows only the task at first. You
 reveal help step by step: hint 1, then hint 2, then the full solution, then an
 explanation of why it works.
 
+**Use it online:** <https://dariuszparys.github.io/ckad-drills/>. Nothing to
+install for reading the curriculum or the drills; you need your own cluster to
+solve them (see Getting started). Your progress is stored in your browser only.
+
 This is an independent study project. It is not affiliated with, endorsed by
 or sponsored by the Linux Foundation or the CNCF, and it contains no questions
 from the real exam. See the Disclaimer section at the end.
@@ -47,7 +51,8 @@ from the real exam. See the Disclaimer section at the end.
    minikube start -p ckad
    ```
 
-2. Open the drills in your browser:
+2. Open the drills in your browser, either the hosted page above or your
+   local copy:
 
    ```bash
    open index.html
@@ -152,7 +157,8 @@ follows your operating system, or pick **Light** or **Dark**. The choice is
 remembered, and **Reset all progress** leaves it alone.
 
 Progress is stored in the browser's `localStorage`. Each browser and each way
-of opening the page (`file://` or `localhost`) keeps its own progress.
+of opening the page (the hosted page, `file://` or `localhost`) keeps its own
+progress.
 
 To start over:
 
